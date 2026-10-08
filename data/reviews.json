@@ -1,0 +1,5 @@
+{
+  "_howTo": "Paste real client reviews below, word for word (ask the client first). The 'What clients say' section on the home and About pages stays hidden while the list is empty. Example entry: {\"quote\": \"John found us a house in Meridian in two weeks...\", \"name\": \"Sarah M.\", \"detail\": \"Bought in Meridian\", \"source\": \"Google\", \"stars\": 5}. Paste your Google Business Profile share link into googleProfileUrl to show a 'See all my reviews on Google' link.",
+  "googleProfileUrl": "",
+  "reviews": []
+}
