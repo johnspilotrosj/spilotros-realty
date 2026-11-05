@@ -1,8 +1,8 @@
 /* Site effects layer (progressive enhancement, runs after React hydrates).
  *
  * Fluid backdrop (Fluid Core 3.3.0 by KrackedDevs, MIT, fx/vendor/fluid-core)
- * on every dark .cta-band: a slow liquid-gold layer under the existing band.
- * The home hero and its video are left untouched.
+ * behind the Contact page's dark "Let's talk about your move." section: a slow
+ * liquid-gold layer under a charcoal scrim. Everything else is left untouched.
  *
  * Nothing here touches React's markup before hydration: elements are added after
  * the page has loaded, re-checked on client-side navigation, and torn down when
@@ -10,14 +10,19 @@
  */
 
 const BRAND = ['#16191c', '#24272b', '#81642f', '#d2b97f']; // charcoal-deep → gold-soft
-const BAND_FLUID = { look: 'MERIDIAN', colors: BRAND, speed: 0.28, seed: 42 };
+const CONTACT_FLUID = { look: 'MERIDIAN', colors: BRAND, speed: 0.28, seed: 42 };
+const HOSTS = 'section#contact.section-dark';
 
 const CSS = `
-.fx-fluid{position:absolute;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
+${HOSTS}{position:relative;isolation:isolate}
+.fx-fluid{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
 .fx-fluid canvas{opacity:0;transition:opacity 1.6s ease}
-.fx-fluid.is-ready canvas{opacity:.5}
+.fx-fluid.is-ready canvas{opacity:.55}
 .fx-fluid:after{content:"";position:absolute;inset:0;
-  background:radial-gradient(70% 90% at 50% 50%,oklch(.21 .008 250 / .72),oklch(.21 .008 250 / .35) 75%)}
+  background:linear-gradient(90deg,oklch(.21 .008 250 / .78),oklch(.21 .008 250 / .5) 55%,oklch(.21 .008 250 / .3))}
+@media (max-width:900px){
+  .fx-fluid:after{background:linear-gradient(180deg,oklch(.21 .008 250 / .78),oklch(.21 .008 250 / .45))}
+}
 `;
 
 let fluidModule = null;
@@ -75,7 +80,7 @@ function unmountGone() {
 function scan() {
   unmountGone();
   if (!webglOK()) return;
-  document.querySelectorAll('section.cta-band').forEach(el => mountFluid(el, BAND_FLUID));
+  document.querySelectorAll(HOSTS).forEach(el => mountFluid(el, CONTACT_FLUID));
 }
 
 function start() {
