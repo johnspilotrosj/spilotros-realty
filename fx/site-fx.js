@@ -10,18 +10,26 @@
  */
 
 const BRAND = ['#16191c', '#24272b', '#81642f', '#d2b97f']; // charcoal-deep → gold-soft
-const CONTACT_FLUID = { look: 'MERIDIAN', colors: BRAND, speed: 0.28, seed: 42 };
+/* Always moving: a clear flow normally, and a slow, gentle drift (instead of a
+   frozen frame) when the visitor's device asks for reduced motion. */
+const SPEED = { normal: 1.0, reduced: 0.25 };
+const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+const CONTACT_FLUID = () => ({
+  look: 'MERIDIAN', colors: BRAND, seed: 42,
+  speed: reduceMotion?.matches ? SPEED.reduced : SPEED.normal,
+  respectReducedMotion: false,
+});
 const HOSTS = 'section#contact.section-dark';
 
 const CSS = `
 ${HOSTS}{position:relative;isolation:isolate}
 .fx-fluid{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
 .fx-fluid canvas{opacity:0;transition:opacity 1.6s ease}
-.fx-fluid.is-ready canvas{opacity:.55}
+.fx-fluid.is-ready canvas{opacity:.7}
 .fx-fluid:after{content:"";position:absolute;inset:0;
-  background:linear-gradient(90deg,oklch(.21 .008 250 / .78),oklch(.21 .008 250 / .5) 55%,oklch(.21 .008 250 / .3))}
+  background:linear-gradient(90deg,oklch(.21 .008 250 / .7),oklch(.21 .008 250 / .4) 55%,oklch(.21 .008 250 / .15))}
 @media (max-width:900px){
-  .fx-fluid:after{background:linear-gradient(180deg,oklch(.21 .008 250 / .78),oklch(.21 .008 250 / .45))}
+  .fx-fluid:after{background:linear-gradient(180deg,oklch(.21 .008 250 / .72),oklch(.21 .008 250 / .35))}
 }
 `;
 
@@ -80,12 +88,16 @@ function unmountGone() {
 function scan() {
   unmountGone();
   if (!webglOK()) return;
-  document.querySelectorAll(HOSTS).forEach(el => mountFluid(el, CONTACT_FLUID));
+  document.querySelectorAll(HOSTS).forEach(el => mountFluid(el, CONTACT_FLUID()));
 }
 
 function start() {
   addStyles();
   scan();
+  reduceMotion?.addEventListener?.('change', e => {
+    const speed = e.matches ? SPEED.reduced : SPEED.normal;
+    for (const art of mounts.values()) art?.set({ speed });
+  });
   const root = document.getElementById('root') || document.body;
   let queued = false;
   new MutationObserver(() => {
